@@ -335,7 +335,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsCheckFolder:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
+- (void)googleDocsCheckFolderComplete:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
 {
 	DebugLog(@"GoogleDocs: check folder complete: %@", error == nil ? [NSString stringWithFormat:@"folder %@", fExists ? (fCreated ? @"created" : @"exists") : @"does not exist"] : error);
 	Assert(m_gstate == gstateEnsureFolder);
