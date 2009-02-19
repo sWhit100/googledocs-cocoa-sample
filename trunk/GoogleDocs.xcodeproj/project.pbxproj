@@ -30,11 +30,7 @@
 		E26A515D0F4D216A00B067EC /* GDataEntryACL.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50CE0F4D216A00B067EC /* GDataEntryACL.m */; };
 		E26A515E0F4D216A00B067EC /* GDataFeedACL.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50D00F4D216A00B067EC /* GDataFeedACL.m */; };
 		E26A515F0F4D216A00B067EC /* GDataEntryBase.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50D30F4D216A00B067EC /* GDataEntryBase.m */; };
-		E26A51600F4D216A00B067EC /* GDataEntryEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50D50F4D216A00B067EC /* GDataEntryEvent.m */; };
-		E26A51610F4D216A00B067EC /* GDataEntryMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50D70F4D216A00B067EC /* GDataEntryMessage.m */; };
 		E26A51620F4D216A00B067EC /* GDataFeedBase.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50D90F4D216A00B067EC /* GDataFeedBase.m */; };
-		E26A51630F4D216A00B067EC /* GDataFeedEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50DB0F4D216A00B067EC /* GDataFeedEvent.m */; };
-		E26A51640F4D216A00B067EC /* GDataFeedMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50DD0F4D216A00B067EC /* GDataFeedMessage.m */; };
 		E26A51650F4D216A00B067EC /* GDataObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50DF0F4D216A00B067EC /* GDataObject.m */; };
 		E26A51660F4D216A00B067EC /* GDataQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50E10F4D216A00B067EC /* GDataQuery.m */; };
 		E26A51670F4D216A00B067EC /* GDataServiceBase.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A50E30F4D216A00B067EC /* GDataServiceBase.m */; };
@@ -60,14 +56,10 @@
 		E26A517B0F4D216A00B067EC /* GDataLink.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A510D0F4D216A00B067EC /* GDataLink.m */; };
 		E26A517C0F4D216A00B067EC /* GDataMoney.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A510F0F4D216A00B067EC /* GDataMoney.m */; };
 		E26A517D0F4D216A00B067EC /* GDataOrganization.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51110F4D216A00B067EC /* GDataOrganization.m */; };
-		E26A517E0F4D216A00B067EC /* GDataOriginalEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51130F4D216A00B067EC /* GDataOriginalEvent.m */; };
 		E26A517F0F4D216A00B067EC /* GDataPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51150F4D216A00B067EC /* GDataPerson.m */; };
 		E26A51800F4D216A00B067EC /* GDataPhoneNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51170F4D216A00B067EC /* GDataPhoneNumber.m */; };
 		E26A51810F4D216A00B067EC /* GDataPostalAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51190F4D216A00B067EC /* GDataPostalAddress.m */; };
 		E26A51820F4D216A00B067EC /* GDataRating.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A511B0F4D216A00B067EC /* GDataRating.m */; };
-		E26A51830F4D216A00B067EC /* GDataRecurrence.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A511D0F4D216A00B067EC /* GDataRecurrence.m */; };
-		E26A51840F4D216A00B067EC /* GDataRecurrenceException.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A511F0F4D216A00B067EC /* GDataRecurrenceException.m */; };
-		E26A51850F4D216A00B067EC /* GDataReminder.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51210F4D216A00B067EC /* GDataReminder.m */; };
 		E26A51860F4D216A00B067EC /* GDataTextConstruct.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51230F4D216A00B067EC /* GDataTextConstruct.m */; };
 		E26A51870F4D216A00B067EC /* GDataValueConstruct.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51250F4D216A00B067EC /* GDataValueConstruct.m */; };
 		E26A51880F4D216A00B067EC /* GDataWhen.m in Sources */ = {isa = PBXBuildFile; fileRef = E26A51270F4D216A00B067EC /* GDataWhen.m */; };
@@ -155,16 +147,8 @@
 		E26A50D00F4D216A00B067EC /* GDataFeedACL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataFeedACL.m; sourceTree = "<group>"; };
 		E26A50D20F4D216A00B067EC /* GDataEntryBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataEntryBase.h; sourceTree = "<group>"; };
 		E26A50D30F4D216A00B067EC /* GDataEntryBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataEntryBase.m; sourceTree = "<group>"; };
-		E26A50D40F4D216A00B067EC /* GDataEntryEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataEntryEvent.h; sourceTree = "<group>"; };
-		E26A50D50F4D216A00B067EC /* GDataEntryEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataEntryEvent.m; sourceTree = "<group>"; };
-		E26A50D60F4D216A00B067EC /* GDataEntryMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataEntryMessage.h; sourceTree = "<group>"; };
-		E26A50D70F4D216A00B067EC /* GDataEntryMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataEntryMessage.m; sourceTree = "<group>"; };
 		E26A50D80F4D216A00B067EC /* GDataFeedBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataFeedBase.h; sourceTree = "<group>"; };
 		E26A50D90F4D216A00B067EC /* GDataFeedBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataFeedBase.m; sourceTree = "<group>"; };
-		E26A50DA0F4D216A00B067EC /* GDataFeedEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataFeedEvent.h; sourceTree = "<group>"; };
-		E26A50DB0F4D216A00B067EC /* GDataFeedEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataFeedEvent.m; sourceTree = "<group>"; };
-		E26A50DC0F4D216A00B067EC /* GDataFeedMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataFeedMessage.h; sourceTree = "<group>"; };
-		E26A50DD0F4D216A00B067EC /* GDataFeedMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataFeedMessage.m; sourceTree = "<group>"; };
 		E26A50DE0F4D216A00B067EC /* GDataObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataObject.h; sourceTree = "<group>"; };
 		E26A50DF0F4D216A00B067EC /* GDataObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataObject.m; sourceTree = "<group>"; };
 		E26A50E00F4D216A00B067EC /* GDataQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataQuery.h; sourceTree = "<group>"; };
@@ -216,8 +200,6 @@
 		E26A510F0F4D216A00B067EC /* GDataMoney.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataMoney.m; sourceTree = "<group>"; };
 		E26A51100F4D216A00B067EC /* GDataOrganization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOrganization.h; sourceTree = "<group>"; };
 		E26A51110F4D216A00B067EC /* GDataOrganization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOrganization.m; sourceTree = "<group>"; };
-		E26A51120F4D216A00B067EC /* GDataOriginalEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataOriginalEvent.h; sourceTree = "<group>"; };
-		E26A51130F4D216A00B067EC /* GDataOriginalEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataOriginalEvent.m; sourceTree = "<group>"; };
 		E26A51140F4D216A00B067EC /* GDataPerson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataPerson.h; sourceTree = "<group>"; };
 		E26A51150F4D216A00B067EC /* GDataPerson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataPerson.m; sourceTree = "<group>"; };
 		E26A51160F4D216A00B067EC /* GDataPhoneNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataPhoneNumber.h; sourceTree = "<group>"; };
@@ -226,12 +208,6 @@
 		E26A51190F4D216A00B067EC /* GDataPostalAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataPostalAddress.m; sourceTree = "<group>"; };
 		E26A511A0F4D216A00B067EC /* GDataRating.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataRating.h; sourceTree = "<group>"; };
 		E26A511B0F4D216A00B067EC /* GDataRating.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataRating.m; sourceTree = "<group>"; };
-		E26A511C0F4D216A00B067EC /* GDataRecurrence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataRecurrence.h; sourceTree = "<group>"; };
-		E26A511D0F4D216A00B067EC /* GDataRecurrence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataRecurrence.m; sourceTree = "<group>"; };
-		E26A511E0F4D216A00B067EC /* GDataRecurrenceException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataRecurrenceException.h; sourceTree = "<group>"; };
-		E26A511F0F4D216A00B067EC /* GDataRecurrenceException.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataRecurrenceException.m; sourceTree = "<group>"; };
-		E26A51200F4D216A00B067EC /* GDataReminder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataReminder.h; sourceTree = "<group>"; };
-		E26A51210F4D216A00B067EC /* GDataReminder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataReminder.m; sourceTree = "<group>"; };
 		E26A51220F4D216A00B067EC /* GDataTextConstruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataTextConstruct.h; sourceTree = "<group>"; };
 		E26A51230F4D216A00B067EC /* GDataTextConstruct.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDataTextConstruct.m; sourceTree = "<group>"; };
 		E26A51240F4D216A00B067EC /* GDataValueConstruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDataValueConstruct.h; sourceTree = "<group>"; };
@@ -460,16 +436,8 @@
 			children = (
 				E26A50D20F4D216A00B067EC /* GDataEntryBase.h */,
 				E26A50D30F4D216A00B067EC /* GDataEntryBase.m */,
-				E26A50D40F4D216A00B067EC /* GDataEntryEvent.h */,
-				E26A50D50F4D216A00B067EC /* GDataEntryEvent.m */,
-				E26A50D60F4D216A00B067EC /* GDataEntryMessage.h */,
-				E26A50D70F4D216A00B067EC /* GDataEntryMessage.m */,
 				E26A50D80F4D216A00B067EC /* GDataFeedBase.h */,
 				E26A50D90F4D216A00B067EC /* GDataFeedBase.m */,
-				E26A50DA0F4D216A00B067EC /* GDataFeedEvent.h */,
-				E26A50DB0F4D216A00B067EC /* GDataFeedEvent.m */,
-				E26A50DC0F4D216A00B067EC /* GDataFeedMessage.h */,
-				E26A50DD0F4D216A00B067EC /* GDataFeedMessage.m */,
 				E26A50DE0F4D216A00B067EC /* GDataObject.h */,
 				E26A50DF0F4D216A00B067EC /* GDataObject.m */,
 				E26A50E00F4D216A00B067EC /* GDataQuery.h */,
@@ -529,8 +497,6 @@
 				E26A510F0F4D216A00B067EC /* GDataMoney.m */,
 				E26A51100F4D216A00B067EC /* GDataOrganization.h */,
 				E26A51110F4D216A00B067EC /* GDataOrganization.m */,
-				E26A51120F4D216A00B067EC /* GDataOriginalEvent.h */,
-				E26A51130F4D216A00B067EC /* GDataOriginalEvent.m */,
 				E26A51140F4D216A00B067EC /* GDataPerson.h */,
 				E26A51150F4D216A00B067EC /* GDataPerson.m */,
 				E26A51160F4D216A00B067EC /* GDataPhoneNumber.h */,
@@ -539,12 +505,6 @@
 				E26A51190F4D216A00B067EC /* GDataPostalAddress.m */,
 				E26A511A0F4D216A00B067EC /* GDataRating.h */,
 				E26A511B0F4D216A00B067EC /* GDataRating.m */,
-				E26A511C0F4D216A00B067EC /* GDataRecurrence.h */,
-				E26A511D0F4D216A00B067EC /* GDataRecurrence.m */,
-				E26A511E0F4D216A00B067EC /* GDataRecurrenceException.h */,
-				E26A511F0F4D216A00B067EC /* GDataRecurrenceException.m */,
-				E26A51200F4D216A00B067EC /* GDataReminder.h */,
-				E26A51210F4D216A00B067EC /* GDataReminder.m */,
 				E26A51220F4D216A00B067EC /* GDataTextConstruct.h */,
 				E26A51230F4D216A00B067EC /* GDataTextConstruct.m */,
 				E26A51240F4D216A00B067EC /* GDataValueConstruct.h */,
@@ -778,11 +738,7 @@
 				E26A515D0F4D216A00B067EC /* GDataEntryACL.m in Sources */,
 				E26A515E0F4D216A00B067EC /* GDataFeedACL.m in Sources */,
 				E26A515F0F4D216A00B067EC /* GDataEntryBase.m in Sources */,
-				E26A51600F4D216A00B067EC /* GDataEntryEvent.m in Sources */,
-				E26A51610F4D216A00B067EC /* GDataEntryMessage.m in Sources */,
 				E26A51620F4D216A00B067EC /* GDataFeedBase.m in Sources */,
-				E26A51630F4D216A00B067EC /* GDataFeedEvent.m in Sources */,
-				E26A51640F4D216A00B067EC /* GDataFeedMessage.m in Sources */,
 				E26A51650F4D216A00B067EC /* GDataObject.m in Sources */,
 				E26A51660F4D216A00B067EC /* GDataQuery.m in Sources */,
 				E26A51670F4D216A00B067EC /* GDataServiceBase.m in Sources */,
@@ -808,14 +764,10 @@
 				E26A517B0F4D216A00B067EC /* GDataLink.m in Sources */,
 				E26A517C0F4D216A00B067EC /* GDataMoney.m in Sources */,
 				E26A517D0F4D216A00B067EC /* GDataOrganization.m in Sources */,
-				E26A517E0F4D216A00B067EC /* GDataOriginalEvent.m in Sources */,
 				E26A517F0F4D216A00B067EC /* GDataPerson.m in Sources */,
 				E26A51800F4D216A00B067EC /* GDataPhoneNumber.m in Sources */,
 				E26A51810F4D216A00B067EC /* GDataPostalAddress.m in Sources */,
 				E26A51820F4D216A00B067EC /* GDataRating.m in Sources */,
-				E26A51830F4D216A00B067EC /* GDataRecurrence.m in Sources */,
-				E26A51840F4D216A00B067EC /* GDataRecurrenceException.m in Sources */,
-				E26A51850F4D216A00B067EC /* GDataReminder.m in Sources */,
 				E26A51860F4D216A00B067EC /* GDataTextConstruct.m in Sources */,
 				E26A51870F4D216A00B067EC /* GDataValueConstruct.m in Sources */,
 				E26A51880F4D216A00B067EC /* GDataWhen.m in Sources */,

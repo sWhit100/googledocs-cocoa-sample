@@ -36,7 +36,7 @@
 
 - (void)googleDocsRetitleComplete:(BOOL)fSuccess count:(NSInteger)count error:error;
 
-- (void)googleDocsCheckFolder:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
+- (void)googleDocsCheckFolderComplete:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
 
 @end
 

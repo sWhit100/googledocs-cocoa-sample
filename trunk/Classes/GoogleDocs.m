@@ -449,7 +449,7 @@ enum
 		{
 			if (self.gop == gopEnsureDir)
 			{
-				[m_owner googleDocsCheckFolder:NO wasCreated:NO error:nil];
+				[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:nil];
 				[self endOperation];
 			}
 			else
@@ -546,7 +546,7 @@ enum
 		break;
 	
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolder:YES wasCreated:self.fDidCreateDir error:nil];
+		[m_owner googleDocsCheckFolderComplete:YES wasCreated:self.fDidCreateDir error:nil];
 		break;
 	
 	case gopVerifyAccount:
@@ -588,7 +588,7 @@ enum
 		break;
 	
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolder:NO wasCreated:NO error:error];
+		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
 		break;
 	
 	case gopVerifyAccount:
@@ -690,7 +690,7 @@ enum
 		break;
 
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolder:NO wasCreated:NO error:error];
+		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
 		break;
 	
 	case gopRetitleFiles:
@@ -775,7 +775,7 @@ enum
 	{
 		self.adirPath = nil;
 	}
-	else if ([dirStringOrArray isMemberOfClass:[NSString class]])
+	else if ([dirStringOrArray isKindOfClass:[NSString class]])
 	{
 		self.adirPath = FEmptyOrNilString(dirStringOrArray) ? nil : [NSArray arrayWithObjects: dirStringOrArray, nil];
 	}
@@ -810,7 +810,7 @@ enum
 		break;
 
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolder:NO wasCreated:NO error:error];
+		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
 		break;
 
 	default:
