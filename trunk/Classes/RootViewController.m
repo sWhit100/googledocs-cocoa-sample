@@ -66,10 +66,6 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 {
 	self.title = @"Google Docs";
 
-#ifndef REVIEW // remove my account info!
-	self.username = @"tomsax@mac.com";
-	self.password = @"Pi18SAPL";
-#endif
 	m_gstate = gstateNil;
 	m_passwordviewcontroller = nil;
 	m_fViewLoaded = NO;
