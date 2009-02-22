@@ -27,6 +27,7 @@
 		    buttonUpload = m_buttonUpload,
             buttonDownload = m_buttonDownload,
 			buttonRename = m_buttonRename,
+			buttonDelete = m_buttonDelete,
 			buttonCheckFolder = m_buttonCheckFolder,
 			buttonEnsureFolder = m_buttonEnsureFolder,
 			spinner = m_spinner,

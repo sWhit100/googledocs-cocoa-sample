@@ -46,6 +46,7 @@
 - (IBAction)upload:(id)sender;
 - (IBAction)download:(id)sender;
 - (IBAction)rename:(id)sender;
+- (IBAction)deleteFiles:(id)sender;
 - (IBAction)checkFolder:(id)sender;
 - (IBAction)ensureFolder:(id)sender;
 

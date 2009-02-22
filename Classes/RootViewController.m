@@ -30,6 +30,7 @@ enum // Google Docs state values
 	gstateSendingFile,
 	gstateReceivingFile,
 	gstateRetitleFiles,
+	gstateDeleteFiles,
 	gstateEnsureFolder,
 	gstateVerifyAccount
 };
@@ -129,6 +130,20 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	}
 }
 
+- (IBAction)deleteFiles:(id)sender
+{
+	if (m_gstate == gstateNil)
+	{
+		if ([self getGoogleDocsUsername:self.username password:self.password])
+		{
+			m_gstate = gstateDeleteFiles;
+			[self.googledocs beginFileDeleteTitle:s_strFileTitle inFolder:self.adirPath keepingNewest:0];
+
+			[self updateControlState];
+		}
+	}
+}
+
 - (IBAction)checkFolder:(id)sender;
 {
 	[self doFolderCheckCanCreate:NO];
@@ -187,6 +202,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 
 		BOOL fEnableButtons = NO;
 		BOOL fSpin = YES;
+		NSString *strStatus = nil;
 		
 		switch (m_gstate)
 		{
@@ -196,21 +212,28 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 			break;
 		
 		case gstateSendingFile:
-			self.strStatus = @"uploading...";
+			strStatus = @"uploading...";
 			break;
 		
 		case gstateReceivingFile:
-			self.strStatus = @"downloading...";
+			strStatus = @"downloading...";
 			break;
 		
 		case gstateRetitleFiles:
-			self.strStatus = @"renaming...";
+			strStatus = @"renaming...";
+			break;
+		
+		case gstateDeleteFiles:
+			strStatus = @"deleting...";
 			break;
 		
 		case gstateEnsureFolder:
-			self.strStatus = @"checking folder...";
+			strStatus = @"checking folder...";
 			break;
 		}
+		
+		if (strStatus != nil)
+			self.strStatus = strStatus;
 
 		rootview.labelStatus.text = self.strStatus;
 
@@ -218,6 +241,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 		rootview.buttonUpload.enabled = fEnableButtons;
 		rootview.buttonDownload.enabled = fEnableButtons;
 		rootview.buttonRename.enabled = fEnableButtons;
+		rootview.buttonDelete.enabled = fEnableButtons;
 		rootview.buttonCheckFolder.enabled = fEnableButtons;
 		rootview.buttonEnsureFolder.enabled = fEnableButtons;
 		
@@ -257,6 +281,14 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	case gstateRetitleFiles:
 		strOp = @"Rename";
 		break;
+	
+	case gstateDeleteFiles:
+		strOp = @"Delete";
+		break;
+	
+	case gstateEnsureFolder:
+		strOp = @"Folder check";
+		break;
 	}
 	
 	self.strStatus = [NSString stringWithFormat:@"%@ %@.", strOp, fSuccess ? @"succeeded" : @"failed"];
@@ -264,12 +296,12 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 
 #pragma mark GoogleDocsController
 
-- (void)googleDocsAccountVerifyComplete:(BOOL)fSuccess error:(NSError *)error
+- (void)googleDocsAccountVerifyComplete:(GoogleDocs *)googledocs valid:(BOOL)fValid error:(NSError *)error
 {
-	m_passwordviewcontroller.isAccountVerified = fSuccess;
+	m_passwordviewcontroller.isAccountVerified = fValid;
 	[m_passwordviewcontroller setError:error];
 	
-	[self endGoogleOp:fSuccess error:error];
+	[self endGoogleOp:fValid error:error];
 	
 	m_gstate = gstateNil;
 	[self updateControlState];
@@ -324,7 +356,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsRetitleComplete:(BOOL)fSuccess count:(NSInteger)count error:error
+- (void)googleDocsRetitleComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error
 {
 	DebugLog(@"GoogleDocs: retitle files complete : %@ (%d renamed)", error == nil ? @"success" : error, count);
 	[self endGoogleOp:error == nil error:error];
@@ -335,7 +367,18 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsCheckFolderComplete:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
+- (void)googleDocsDeleteComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error
+{
+	DebugLog(@"GoogleDocs: delete files complete : %@ (%d deleted)", error == nil ? @"success" : error, count);
+	[self endGoogleOp:error == nil error:error];
+
+	self.strStatus = [NSString stringWithFormat:@"%@ %d deleted.", self.strStatus, count];
+
+	m_gstate = gstateNil;
+	[self updateControlState];
+}
+
+- (void)googleDocsCheckFolderComplete:(GoogleDocs *)googledocs exists:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
 {
 	DebugLog(@"GoogleDocs: check folder complete: %@", error == nil ? [NSString stringWithFormat:@"folder %@", fExists ? (fCreated ? @"created" : @"exists") : @"does not exist"] : error);
 	Assert(m_gstate == gstateEnsureFolder);
@@ -417,6 +460,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[rootview.buttonUpload setTitleColor:colorDisabled forState:UIControlStateDisabled];
 	[rootview.buttonDownload setTitleColor:colorDisabled forState:UIControlStateDisabled];
 	[rootview.buttonRename setTitleColor:colorDisabled forState:UIControlStateDisabled];
+	[rootview.buttonDelete setTitleColor:colorDisabled forState:UIControlStateDisabled];
 	[rootview.buttonCheckFolder setTitleColor:colorDisabled forState:UIControlStateDisabled];
 	[rootview.buttonEnsureFolder setTitleColor:colorDisabled forState:UIControlStateDisabled];
 
