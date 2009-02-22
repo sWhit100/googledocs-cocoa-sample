@@ -27,6 +27,7 @@
 	IBOutlet UIButton *m_buttonUpload;
 	IBOutlet UIButton *m_buttonDownload;
 	IBOutlet UIButton *m_buttonRename;
+	IBOutlet UIButton *m_buttonDelete;
 	IBOutlet UIButton *m_buttonCheckFolder;
 	IBOutlet UIButton *m_buttonEnsureFolder;
 	IBOutlet UIActivityIndicatorView *m_spinner;
@@ -37,6 +38,7 @@
 @property (nonatomic, assign) UIButton *buttonUpload;
 @property (nonatomic, assign) UIButton *buttonDownload;
 @property (nonatomic, assign) UIButton *buttonRename;
+@property (nonatomic, assign) UIButton *buttonDelete;
 @property (nonatomic, assign) UIButton *buttonCheckFolder;
 @property (nonatomic, assign) UIButton *buttonEnsureFolder;
 @property (nonatomic, assign) UIActivityIndicatorView *spinner;

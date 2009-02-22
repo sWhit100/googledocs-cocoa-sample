@@ -29,6 +29,13 @@
 // REVIEW: Customize this string to identify your application.
 static NSString *s_strUserAgent = @"com.idleloop.Sample_GoogleDocs_App";
 
+#ifdef DEBUG
+void DumpEntryArray(NSArray *aentry);
+#endif
+
+static NSString *s_strRecursionError = @"Internal Error: recursion not allowed";
+NSError *NSErrorWithMessage(NSString *strMessage);
+
 enum
 {
 	gopNil,
@@ -36,6 +43,7 @@ enum
 	gopUploadFile,
 	gopDownloadFile,
 	gopRetitleFiles,
+	gopDeleteFiles,
 	gopEnsureDir
 };
 
@@ -64,6 +72,10 @@ enum
 @property (nonatomic, retain) NSMutableData *dataDownload;
 @property (nonatomic, assign) long long cbDownloadTotalEstimate;
 
+@property (nonatomic, assign) NSInteger cfileKeep;
+@property (nonatomic, retain) NSArray *aentryDelete;
+@property (nonatomic, assign) NSInteger ientryDelete;
+
 @property (nonatomic, retain) NSArray *adirPathCache;
 @property (nonatomic, retain) NSURL *urlFolderFeedCache;
 @property (nonatomic, assign) BOOL fUsedCache;
@@ -77,8 +89,15 @@ enum
 - (void)setDirArrary:(id)dirStringOrArray;
 - (void)sendFailureNotice:(NSString *)strErrorMessage;
 - (void)retitleNextFile;
+- (void)deleteNextFile;
 - (BOOL)fRetryCachedQuery;
 - (void)endOperation;
+
+@end
+
+@interface GDataEntryDocBase (IdleLoop)
+
+- (NSComparisonResult)compareEntriesByUpdatedDate:(GDataEntryDocBase *)docOther;
 
 @end
 
@@ -102,6 +121,9 @@ enum
 			urlFolderFeed = m_urlFolderFeed,
 			aentryRetitle = m_aentryRetitle,
 			ientryRetitle = m_ientryRetitle,
+			cfileKeep = m_cfileKeep,
+			aentryDelete = m_aentryDelete,
+			ientryDelete = m_ientryDelete,
 			adirPathCache = m_adirPathCache,
 			urlFolderFeedCache = m_urlFolderFeedCache,
 			fUsedCache = m_fUsedCache,
@@ -148,6 +170,11 @@ enum
 		self.gop = gopVerifyAccount;
 		[self fetchDocListForFeed:nil title:nil username:username password:password];
 	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsAccountVerifyComplete:self valid:NO error:NSErrorWithMessage(s_strRecursionError)];
+	}
 }
 
 // This method begins the process to upload a file. It first sets up some state,
@@ -171,6 +198,11 @@ enum
 		self.gop = gopUploadFile;
 		[self fetchDocListForFeed:nil title:title username:self.username password:self.password];
 	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsUploadComplete:self error:NSErrorWithMessage(s_strRecursionError)];
+	}
 }
 
 // This method begins the process to upload a file. It first sets up some state,
@@ -190,6 +222,11 @@ enum
 		self.gop = gopDownloadFile;
 		[self fetchDocListForFeed:nil title:title username:self.username password:self.password];
 	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsDownloadComplete:self data:nil error:NSErrorWithMessage(s_strRecursionError)];
+	}
 }
 
 - (void)beginFileRetitleFrom:(NSString *)titleOld toTitle:(NSString *)titleNew inFolder:(id)dirStringOrArray
@@ -203,6 +240,29 @@ enum
 		self.gop = gopRetitleFiles;
 		[self fetchDocListForFeed:nil title:titleOld username:self.username password:self.password];
 	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsRetitleComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError)];
+	}
+}
+
+- (void)beginFileDeleteTitle:(NSString *)title inFolder:(id)dirStringOrArray keepingNewest:(NSInteger)cfileKeep
+{
+	if (self.gop == gopNil)
+	{
+		self.title = title;
+		self.cfileKeep = cfileKeep;
+		[self setDirArrary:dirStringOrArray];
+
+		self.gop = gopDeleteFiles;
+		[self fetchDocListForFeed:nil title:title username:self.username password:self.password];
+	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsDeleteComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError)];
+	}
 }
 
 - (void)beginFolderCheck:(id)dirStringOrArray createIfNeeded:(BOOL)fCreate
@@ -214,6 +274,11 @@ enum
 
 		self.gop = gopEnsureDir;
 		[self fetchDocListForFeed:nil title:nil username:self.username password:self.password];
+	}
+	else
+	{
+		Assert(NO);
+		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:NSErrorWithMessage(s_strRecursionError)];
 	}
 }
 
@@ -449,8 +514,8 @@ enum
 		{
 			if (self.gop == gopEnsureDir)
 			{
-				[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:nil];
 				[self endOperation];
+				[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:nil];
 			}
 			else
 			{
@@ -532,6 +597,7 @@ enum
 		}
 		else
 		{
+			[self endOperation];
 			[m_owner googleDocsDownloadComplete:self data:nil error:nil];
 		}
 		break;
@@ -545,20 +611,57 @@ enum
 		}
 		break;
 	
+	case gopDeleteFiles:
+		{
+			int centry = [[self.feedDocList entries] count];
+			if (centry <= self.cfileKeep)
+			{
+				self.aentryDelete = nil;
+			}
+			else if (self.cfileKeep == 0)
+			{
+				self.aentryDelete = [NSArray arrayWithArray:[self.feedDocList entries]];
+			}
+			else
+			{
+#ifdef DEBUG
+				DumpEntryArray([self.feedDocList entries]);
+#endif
+
+				Assert(self.cfileKeep > 0 && centry > self.cfileKeep);
+				NSMutableArray *aentryT = [NSMutableArray arrayWithArray:[self.feedDocList entries]];
+				[aentryT sortUsingSelector:@selector(compareEntriesByUpdatedDate:)];
+				[aentryT removeObjectsInRange:NSMakeRange(0, self.cfileKeep)];
+				
+				self.aentryDelete = aentryT;
+			}
+
+#ifdef DEBUG
+			DumpEntryArray(self.aentryDelete);
+#endif
+			self.ientryDelete = 0;
+			[self deleteNextFile];
+			return;
+		}
+		break;
+	
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolderComplete:YES wasCreated:self.fDidCreateDir error:nil];
+		[self endOperation];
+		[m_owner googleDocsCheckFolderComplete:self exists:YES wasCreated:self.fDidCreateDir error:nil];
 		break;
 	
 	case gopVerifyAccount:
-		[m_owner googleDocsAccountVerifyComplete:YES error:nil];
+		[self endOperation];
+		[m_owner googleDocsAccountVerifyComplete:self valid:YES error:nil];
 		break;
 
 	default:
+		[self endOperation];
 		Assert(NO);
 		break;
 	}
-	
-	[self endOperation];
+
+	Assert(self.gop == gopNil);
 }
 
 // failed
@@ -572,10 +675,11 @@ enum
 	if ([self fRetryCachedQuery])
 		return;
 
-	switch (self.gop)
+	NSInteger gop = self.gop;
+	[self endOperation];
+	switch (gop)
 	{
 	case gopUploadFile:
-		self.dataToUpload = nil;
 		[m_owner googleDocsUploadComplete:self error:error];
 		break;
 	
@@ -584,23 +688,25 @@ enum
 		break;
 	
 	case gopRetitleFiles:
-		[m_owner googleDocsRetitleComplete:NO count:self.ientryRetitle error:error];
+		[m_owner googleDocsRetitleComplete:self success:NO count:self.ientryRetitle error:error];
+		break;
+	
+	case gopDeleteFiles:
+		[m_owner googleDocsDeleteComplete:self success:NO count:self.ientryDelete error:error];
 		break;
 	
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
+		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:error];
 		break;
 	
 	case gopVerifyAccount:
-		[m_owner googleDocsAccountVerifyComplete:NO error:error];
+		[m_owner googleDocsAccountVerifyComplete:self valid:NO error:error];
 		break;
 
 	default:
 		Assert(NO);
 		break;
 	}
-	
-	[self endOperation];
 }
 
 #pragma mark Upload Internals
@@ -654,13 +760,19 @@ enum
 		switch (self.gop)
 		{
 		case gopUploadFile:
+			[self endOperation];
 			[m_owner googleDocsUploadComplete:self error:nil];
 			break;
 		
 		case gopRetitleFiles:
 			++self.ientryRetitle;
 			[self retitleNextFile];
-			return; // retitleNext file will end the operation when appropriate
+			return; // retitleNextFile file will end the operation when appropriate
+		
+		case gopDeleteFiles:
+			++self.ientryDelete;
+			[self deleteNextFile];
+			return; // deleteNextFile file will end the operation when appropriate
 
 		default:
 			DebugLog(@"gop = %d", self.gop);
@@ -683,26 +795,30 @@ enum
 	if ([self fRetryCachedQuery])
 		return;
 
-	switch (self.gop)
+	NSInteger gop = self.gop;
+	[self endOperation];
+	switch (gop)
 	{
 	case gopUploadFile:
 		[m_owner googleDocsUploadComplete:self error:error];
 		break;
 
 	case gopEnsureDir:
-		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
+		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:error];
 		break;
 	
 	case gopRetitleFiles:
-		[m_owner googleDocsRetitleComplete:NO count:self.ientryRetitle error:error];
+		[m_owner googleDocsRetitleComplete:self success:NO count:self.ientryRetitle error:error];
+		break;
+	
+	case gopDeleteFiles:
+		[m_owner googleDocsDeleteComplete:self success:NO count:self.ientryDelete error:error];
 		break;
 	
 	default:
 		Assert(NO);
 		break;
 	}
-
-	[self endOperation];
 }
 
 #pragma mark DownLoad Internals
@@ -735,8 +851,8 @@ enum
 	else
 	{
 		// don't know why this failed, but let the caller know the game is over.
-		[m_owner googleDocsDownloadComplete:self data:nil error:nil];
 		[self endOperation];
+		[m_owner googleDocsDownloadComplete:self data:nil error:nil];
 	}
 }
 
@@ -748,14 +864,16 @@ enum
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
 	[self.dataDownload appendData:data];
+	
 	[m_owner googleDocsDownloadProgress:self read:[self.dataDownload length] ofEstimatedTotal:m_cbDownloadTotalEstimate];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	[m_owner googleDocsDownloadComplete:self data:self.dataDownload error:nil];
-	
+	NSData *data = [self.dataDownload retain];
 	[self endOperation];
+	[m_owner googleDocsDownloadComplete:self data:data error:nil];
+	[data release];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
@@ -763,8 +881,8 @@ enum
 	if ([self fRetryCachedQuery])
 		return;
 
-	[m_owner googleDocsDownloadComplete:self data:nil error:error];
 	[self endOperation];
+	[m_owner googleDocsDownloadComplete:self data:nil error:error];
 }
 
 #pragma mark Helper Methods
@@ -789,16 +907,14 @@ enum
 
 - (void)sendFailureNotice:(NSString *)strErrorMessage
 {
-	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
-		strErrorMessage, NSLocalizedFailureReasonErrorKey,
-			nil
-		];
-	NSError *error = [NSError errorWithDomain:s_strUserAgent code:1 userInfo:dict];
+	NSError *error = NSErrorWithMessage(strErrorMessage);
 
-	switch (self.gop)
+	NSInteger gop = self.gop;
+	[self endOperation];
+	switch (gop)
 	{
 	case gopVerifyAccount:
-		[m_owner googleDocsAccountVerifyComplete:NO error:error];
+		[m_owner googleDocsAccountVerifyComplete:self valid:NO error:error];
 		break;
 
 	case gopUploadFile:
@@ -809,16 +925,22 @@ enum
 		[m_owner googleDocsDownloadComplete:self data:nil error:error];
 		break;
 
-	case gopEnsureDir:
-		[m_owner googleDocsCheckFolderComplete:NO wasCreated:NO error:error];
+	case gopRetitleFiles:
+		[m_owner googleDocsRetitleComplete:self success:NO count:self.ientryRetitle error:error];
+		break;
+	
+	case gopDeleteFiles:
+		[m_owner googleDocsDeleteComplete:self success:NO count:self.ientryDelete error:error];
 		break;
 
+	case gopEnsureDir:
+		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:error];
+		break;
+	
 	default:
 		Assert(NO);
 		break;
 	}
-	
-	[self endOperation];
 }
 
 - (void)retitleNextFile
@@ -841,8 +963,29 @@ enum
 	else
 	{
 		// there weren't any (more) files to rename
-		[m_owner googleDocsRetitleComplete:YES count:self.ientryRetitle error:nil];
 		[self endOperation];
+		[m_owner googleDocsRetitleComplete:self success:YES count:self.ientryRetitle error:nil];
+	}
+}
+
+- (void)deleteNextFile
+{
+	if (self.aentryDelete != nil && self.ientryDelete < [self.aentryDelete count])
+	{
+		GDataServiceGoogleDocs *serviceDocs = [self serviceDocs:self.username password:self.password];
+		GDataEntryDocBase *entryDelete = [self.aentryDelete objectAtIndex:self.ientryDelete];
+		[entryDelete setTitleWithString:self.titleNew];
+
+		self.ticketUpload = [serviceDocs deleteDocEntry:entryDelete
+										delegate:self
+										didFinishSelector:@selector(uploadFileTicket:finishedWithEntry:)
+										didFailSelector:@selector(uploadFileTicket:failedWithError:)];
+	}
+	else
+	{
+		// there weren't any (more) files to rename
+		[self endOperation];
+		[m_owner googleDocsDeleteComplete:self success:YES count:self.ientryDelete error:nil];
 	}
 }
 
@@ -876,9 +1019,58 @@ enum
 	self.title = nil;
 	self.titleNew = nil;
 	self.adirPath = nil;
-	self.aentryRetitle = nil;
-	self.ientryRetitle = 0;
 	self.dataDownload = nil;
+	self.aentryRetitle = nil;
+	self.aentryDelete = nil;
 }
 
 @end
+
+@implementation GDataEntryDocBase (IdleLoop)
+
+- (NSComparisonResult)compareEntriesByUpdatedDate:(GDataEntryDocBase *)docOther
+{
+	NSComparisonResult nscomp = NSOrderedSame;
+
+	NSDateComponents *datecompSelf = [[docOther updatedDate] dateComponents];
+	NSDateComponents *datecompOther = [[docOther updatedDate] dateComponents];
+
+	if ([datecompSelf year] != [datecompOther year])
+		nscomp = [datecompSelf year] > [datecompOther year] ? NSOrderedAscending : NSOrderedDescending;
+	else if ([datecompSelf month] != [datecompOther month])
+		nscomp = [datecompSelf month] > [datecompOther month] ? NSOrderedAscending : NSOrderedDescending;
+	else if ([datecompSelf day] != [datecompOther day])
+		nscomp = [datecompSelf day] > [datecompOther day] ? NSOrderedAscending : NSOrderedDescending;
+	else if ([datecompSelf hour] != [datecompOther hour])
+		nscomp = [datecompSelf hour] > [datecompOther hour] ? NSOrderedAscending : NSOrderedDescending;
+	else if ([datecompSelf minute] != [datecompOther minute])
+		nscomp = [datecompSelf minute] > [datecompOther minute] ? NSOrderedAscending : NSOrderedDescending;
+	else if ([datecompSelf second] != [datecompOther second])
+		nscomp = [datecompSelf second] > [datecompOther second] ? NSOrderedAscending : NSOrderedDescending;
+
+	return nscomp;
+}
+
+@end
+
+NSError *NSErrorWithMessage(NSString *strMessage)
+{
+	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+		strMessage, NSLocalizedFailureReasonErrorKey,
+			nil
+		];
+	return [NSError errorWithDomain:s_strUserAgent code:1 userInfo:dict];
+}
+
+#ifdef DEBUG
+void DumpEntryArray(NSArray *aentry)
+{
+	if (aentry == nil)
+		return;
+	
+	DebugLog(@"-----");
+	for (GDataEntryDocBase *doc in aentry)
+		DebugLog(@"%@ %@\n", [doc title], [[doc updatedDate] stringValue]);
+}
+#endif
+

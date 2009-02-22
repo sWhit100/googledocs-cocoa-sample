@@ -26,7 +26,7 @@
 
 @protocol GoogleDocsController
 
-- (void)googleDocsAccountVerifyComplete:(BOOL)fSuccess error:(NSError *)error;
+- (void)googleDocsAccountVerifyComplete:(GoogleDocs *)googledocs valid:(BOOL)fValid error:(NSError *)error;
 
 - (void)googleDocsUploadProgress:(GoogleDocs *)googledocs read:(unsigned long long)cbRead of:(unsigned long long)cbTotal;
 - (void)googleDocsUploadComplete:(GoogleDocs *)googledocs error:(NSError *)error;
@@ -34,9 +34,11 @@
 - (void)googleDocsDownloadProgress:(GoogleDocs *)googledocs read:(unsigned long long)cbRead ofEstimatedTotal:(unsigned long long)cbTotalEstimate;
 - (void)googleDocsDownloadComplete:(GoogleDocs *)googledocs data:(NSData *)data error:(NSError *)error;
 
-- (void)googleDocsRetitleComplete:(BOOL)fSuccess count:(NSInteger)count error:error;
+- (void)googleDocsRetitleComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error;
 
-- (void)googleDocsCheckFolderComplete:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
+- (void)googleDocsDeleteComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error;
+
+- (void)googleDocsCheckFolderComplete:(GoogleDocs *)googledocs exists:(BOOL)fExists wasCreated:(BOOL)fCreated error:(NSError *)error;
 
 @end
 
@@ -77,6 +79,11 @@
 	// download state
 	long long m_cbDownloadTotalEstimate;
 	NSMutableData *m_dataDownload;
+	
+	// delete files state
+	NSInteger m_cfileKeep;
+	NSArray *m_aentryDelete;
+	NSInteger m_ientryDelete;
 }
 
 @property (nonatomic, retain) NSString *username;
@@ -88,6 +95,7 @@
 - (void)beginUploadData:(NSData *)dataUpload withTitle:(NSString *)title inFolder:(id)dirStringOrArray replaceExisting:(BOOL)fReplaceExisting;
 - (void)beginDownloadTitle:(NSString *)title inFolder:(id)dirStringOrArray;
 - (void)beginFileRetitleFrom:(NSString *)titleOld toTitle:(NSString *)titleNew inFolder:(id)dirStringOrArray;
+- (void)beginFileDeleteTitle:(NSString *)title inFolder:(id)dirStringOrArray keepingNewest:(NSInteger)cfileKeep;
 - (void)beginFolderCheck:(id)dirStringOrArray createIfNeeded:(BOOL)fCreate;
 
 @end

@@ -109,7 +109,7 @@
 					<object class="IBUIActivityIndicatorView" id="1070923101">
 						<reference key="NSNextResponder" ref="500361058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{275, 291}, {20, 20}}</string>
+						<string key="NSFrame">{{280, 336}, {20, 20}}</string>
 						<reference key="NSSuperview" ref="500361058"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -120,7 +120,7 @@
 					<object class="IBUILabel" id="616185386">
 						<reference key="NSNextResponder" ref="500361058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{20, 290}, {252, 21}}</string>
+						<string key="NSFrame">{{20, 335}, {252, 21}}</string>
 						<reference key="NSSuperview" ref="500361058"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -158,7 +158,7 @@
 					<object class="IBUIButton" id="928557691">
 						<reference key="NSNextResponder" ref="500361058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{20, 245}, {280, 37}}</string>
+						<string key="NSFrame">{{20, 290}, {280, 37}}</string>
 						<reference key="NSSuperview" ref="500361058"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -179,7 +179,7 @@
 					<object class="IBUIButton" id="845967672">
 						<reference key="NSNextResponder" ref="500361058"/>
 						<int key="NSvFlags">292</int>
-						<string key="NSFrame">{{20, 200}, {280, 37}}</string>
+						<string key="NSFrame">{{20, 245}, {280, 37}}</string>
 						<reference key="NSSuperview" ref="500361058"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -191,6 +191,27 @@
 						<string key="IBUIDisabledTitle">Check Folder Existence</string>
 						<string key="IBUISelectedTitle">Check Folder Existence</string>
 						<string key="IBUINormalTitle">Check Folder Existence</string>
+						<reference key="IBUIHighlightedTitleColor" ref="974557433"/>
+						<object class="NSColor" key="IBUINormalTitleColor">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MC4xOTYwNzg0MyAwLjMwOTgwMzkzIDAuNTIxNTY4NjYAA</bytes>
+						</object>
+					</object>
+					<object class="IBUIButton" id="633296301">
+						<reference key="NSNextResponder" ref="500361058"/>
+						<int key="NSvFlags">292</int>
+						<string key="NSFrame">{{20, 200}, {280, 37}}</string>
+						<reference key="NSSuperview" ref="500361058"/>
+						<bool key="IBUIOpaque">NO</bool>
+						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
+						<int key="IBUIContentHorizontalAlignment">0</int>
+						<int key="IBUIContentVerticalAlignment">0</int>
+						<reference key="IBUIFont" ref="82632359"/>
+						<int key="IBUIButtonType">1</int>
+						<string key="IBUIHighlightedTitle">Delete</string>
+						<string key="IBUIDisabledTitle">Delete</string>
+						<string key="IBUISelectedTitle">Delete</string>
+						<string key="IBUINormalTitle">Delete</string>
 						<reference key="IBUIHighlightedTitleColor" ref="974557433"/>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
@@ -339,6 +360,23 @@
 					</object>
 					<int key="connectionID">39</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">deleteFiles:</string>
+						<reference key="source" ref="633296301"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">41</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">m_buttonDelete</string>
+						<reference key="source" ref="500361058"/>
+						<reference key="destination" ref="633296301"/>
+					</object>
+					<int key="connectionID">42</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -371,6 +409,7 @@
 							<reference ref="526593869"/>
 							<reference ref="779468028"/>
 							<reference ref="824623489"/>
+							<reference ref="633296301"/>
 							<reference ref="845967672"/>
 							<reference ref="928557691"/>
 							<reference ref="616185386"/>
@@ -418,6 +457,11 @@
 						<reference key="object" ref="845967672"/>
 						<reference key="parent" ref="500361058"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">40</int>
+						<reference key="object" ref="633296301"/>
+						<reference key="parent" ref="500361058"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -437,6 +481,7 @@
 					<string>30.IBPluginDependency</string>
 					<string>33.IBPluginDependency</string>
 					<string>37.IBPluginDependency</string>
+					<string>40.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -444,6 +489,7 @@
 					<string>UIResponder</string>
 					<string>RootView</string>
 					<string>{{593, 154}, {320, 460}}</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -475,7 +521,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">39</int>
+			<int key="maxID">42</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -488,6 +534,7 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>m_buttonCheckFolder</string>
+							<string>m_buttonDelete</string>
 							<string>m_buttonDownload</string>
 							<string>m_buttonEnsureFolder</string>
 							<string>m_buttonLogin</string>
@@ -498,6 +545,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>
 							<string>UIButton</string>
@@ -521,6 +569,7 @@
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>checkFolder:</string>
+							<string>deleteFiles:</string>
 							<string>download:</string>
 							<string>ensureFolder:</string>
 							<string>login:</string>
@@ -529,6 +578,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
