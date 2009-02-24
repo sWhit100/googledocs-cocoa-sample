@@ -340,15 +340,27 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 
 	if (data != nil)
 	{
+#ifdef DEBUG // in the debug version, write the raw data to a file so you can look at it if something goes wrong
+		NSError *errorWrite = nil;
+		if (![data writeToFile:[GoogleDocsAppDelegate getDocumentPath:@"result.html"] options:0 error:&errorWrite])
+			DebugLog(@"Failed to write out raw download file contents: %@", errorWrite);
+#endif
+
 		// extract the original XML from the HTML-encoded data
 		NSData *dataXML = [data dataDecodeFromHtml];
 		
-		if (dataXML != nil)
+		if (dataXML == nil)
+		{
+			self.strStatus = @"Could not decode downloaded file.";
+		}
+		else
 		{
 			// unarchive the string and use it to set the status string
 			NSString *strResult = [NSKeyedUnarchiver unarchiveObjectWithData:dataXML];
 			if (strResult != nil)
 				self.strStatus = [NSString stringWithFormat:@"received: %@", strResult];
+			else
+				self.strStatus = @"Could not load decoded file";
 		}
 	}
 
@@ -356,7 +368,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsRetitleComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error
+- (void)googleDocsRetitleComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:(NSError *)error
 {
 	DebugLog(@"GoogleDocs: retitle files complete : %@ (%d renamed)", error == nil ? @"success" : error, count);
 	[self endGoogleOp:error == nil error:error];
@@ -367,7 +379,7 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsDeleteComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:error
+- (void)googleDocsDeleteComplete:(GoogleDocs *)googledocs success:(BOOL)fSuccess count:(NSInteger)count error:(NSError *)error
 {
 	DebugLog(@"GoogleDocs: delete files complete : %@ (%d deleted)", error == nil ? @"success" : error, count);
 	[self endGoogleOp:error == nil error:error];
