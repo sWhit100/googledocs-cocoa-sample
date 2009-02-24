@@ -34,7 +34,7 @@ void DumpEntryArray(NSArray *aentry);
 #endif
 
 static NSString *s_strRecursionError = @"Internal Error: recursion not allowed";
-NSError *NSErrorWithMessage(NSString *strMessage);
+NSError *NSErrorWithMessage(NSString *strMessage, NSInteger code);
 
 enum
 {
@@ -87,7 +87,7 @@ enum
 - (BOOL)fGetMIMEType:(NSString **)mimeType andEntryClass:(Class *)class forExtension:(NSString *)extension;
 
 - (void)setDirArrary:(id)dirStringOrArray;
-- (void)sendFailureNotice:(NSString *)strErrorMessage;
+- (void)sendFailureNotice:(NSString *)strErrorMessage code:(NSInteger)code;
 - (void)retitleNextFile;
 - (void)deleteNextFile;
 - (BOOL)fRetryCachedQuery;
@@ -173,7 +173,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsAccountVerifyComplete:self valid:NO error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsAccountVerifyComplete:self valid:NO error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -201,7 +201,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsUploadComplete:self error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsUploadComplete:self error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -225,7 +225,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsDownloadComplete:self data:nil error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsDownloadComplete:self data:nil error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -243,7 +243,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsRetitleComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsRetitleComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -261,7 +261,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsDeleteComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsDeleteComplete:self success:NO count:0 error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -278,7 +278,7 @@ enum
 	else
 	{
 		Assert(NO);
-		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:NSErrorWithMessage(s_strRecursionError)];
+		[m_owner googleDocsCheckFolderComplete:self exists:NO wasCreated:NO error:NSErrorWithMessage(s_strRecursionError, gecResursion)];
 	}
 }
 
@@ -388,6 +388,7 @@ enum
 	self.ticketDocListFetch = nil;
 
 	GDataServiceGoogleDocs *service = [self serviceDocs:username password:password];
+	DebugLog(@"user = %@, authToken = %@", service.username, [service authToken]);
 
 	// if we're starting to traverse a directory path, check to see if we have already cached
 	// the feed for the destination folder
@@ -456,12 +457,12 @@ enum
 	self.ticketDocListFetch = nil;
 
 #ifdef DEBUG
-	for (id entry in [object entries])
+	for (GDataEntryBase *entry in [object entries])
 	{
 		DebugLog(@"%@", entry);
 		DebugLog(@"title: %@, edited date: %@",
-			[(GDataTextConstruct *)[entry title] stringValue],
-			[(GDataDateTime *)[entry editedDate] stringValue]
+			[[entry title] stringValue],
+			[[entry updatedDate] RFC3339String]
 			);
 	}
 #endif
@@ -493,7 +494,7 @@ enum
 			}
 			else
 			{
-				[self sendFailureNotice:@"Unexpected error reading folder."];
+				[self sendFailureNotice:@"Unexpected error reading folder." code:gecMissingFolderFeed];
 			}
 		}
 		else if (self.fCanCreateDir)
@@ -519,7 +520,7 @@ enum
 			}
 			else
 			{
-				[self sendFailureNotice:@"Folder not found."];
+				[self sendFailureNotice:@"Folder not found." code:gecFolderNotFound];
 			}
 		}
 		return;
@@ -540,7 +541,7 @@ enum
 			NSString *strExtension = [self.title pathExtension];
 			if (![self fGetMIMEType:&typeMime andEntryClass:&classEntry forExtension:strExtension])
 			{
-				[self sendFailureNotice:[NSString stringWithFormat:@"Unknown file extension: %@", self.title]];
+				[self sendFailureNotice:[NSString stringWithFormat:@"Unknown file extension: %@", self.title] code:gecUnknownFileExtension];
 				return;
 			}
 
@@ -724,7 +725,7 @@ enum
 - (void)uploadFileTicket:(GDataServiceTicket *)ticket
      finishedWithEntry:(GDataEntryDocBase *)entry
 {
-	DebugLog(@"upload successful");
+	DebugLog(@"upload successful: title = %@ URL = %@", [[entry title] stringValue], [NSURL URLWithString:[[entry content] sourceURI]]);
 
 	self.ticketUpload = nil;
 
@@ -751,7 +752,7 @@ enum
 		}
 		else
 		{
-			[self sendFailureNotice:@"Unexpected error creating folder."];
+			[self sendFailureNotice:@"Unexpected error creating folder." code:gecNewFolderCreationError];
 			return;
 		}
 	}
@@ -825,9 +826,7 @@ enum
 
 - (void)downloadEntry:(GDataEntryDocBase *)entry
 {
-	NSString *sourceURI = [[entry content] sourceURI];
-
-	NSURL *url = [NSURL URLWithString:sourceURI];
+	NSURL *url = [NSURL URLWithString:[[entry content] sourceURI]];
 	if (url)
 	{
 		// read the document's contents asynchronously from the network
@@ -840,6 +839,8 @@ enum
 		// user's account with Safari, or if the document was published with
 		// public access.
 		GDataServiceGoogleDocs *service = [self serviceDocs:self.username password:self.password];
+		DebugLog(@"download document %@ from: %@", [[entry title] stringValue], url);
+		DebugLog(@"user = %@, authToken = %@", service.username, [service authToken]);
 		NSURLRequest *request = [service requestForURL:url
 												  ETag:nil
                                             httpMethod:nil];
@@ -905,9 +906,9 @@ enum
 	self.fDidCreateDir = NO;
 }
 
-- (void)sendFailureNotice:(NSString *)strErrorMessage
+- (void)sendFailureNotice:(NSString *)strErrorMessage code:(NSInteger)code
 {
-	NSError *error = NSErrorWithMessage(strErrorMessage);
+	NSError *error = NSErrorWithMessage(strErrorMessage, code);
 
 	NSInteger gop = self.gop;
 	[self endOperation];
@@ -1053,13 +1054,13 @@ enum
 
 @end
 
-NSError *NSErrorWithMessage(NSString *strMessage)
+NSError *NSErrorWithMessage(NSString *strMessage, NSInteger code)
 {
 	NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
 		strMessage, NSLocalizedFailureReasonErrorKey,
 			nil
 		];
-	return [NSError errorWithDomain:s_strUserAgent code:1 userInfo:dict];
+	return [NSError errorWithDomain:s_strUserAgent code:code userInfo:dict];
 }
 
 #ifdef DEBUG

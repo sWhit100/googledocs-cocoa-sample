@@ -61,7 +61,7 @@ static const char s_szSuffix[] =
 static const char s_achHex[] = "0123456789ABCDEF";
 static UInt8 s_mp_ch_val[256];
 
-#define _FAsciiToDecTableValid() (s_mp_ch_val[1] == 1)
+#define _FAsciiToDecTableValid() (s_mp_ch_val['1'] == 1)
 
 static void _InitAsciiToDecTable()
 {
@@ -191,36 +191,39 @@ static void _InitAsciiToDecTable()
 	// prepare for error return
 	NSData *dataDecoded = nil;
 	
-	// convert hex doublettes to bytes
-	UInt8 *pbDst = pabBuffer;
-	while (pbSrc < pbSrcLim-1)
-	{
-		UInt8 b1 = *pbSrc++;
-		if (b1 == '<')
-			break;
-		if (b1 <= ' ')
-			continue;
-		b1 = s_mp_ch_val[b1];
-		if (b1 == 0xFF)
+	if (pbSrc < pbSrcLim)
+	{	
+		// convert hex doublettes to bytes
+		UInt8 *pbDst = pabBuffer;
+		while (pbSrc < pbSrcLim-1)
 		{
-			DebugLog(@"Invalid byte encountered in data stream");
-			goto LReturn;
-		}
+			UInt8 b1 = *pbSrc++;
+			if (b1 == '<')
+				break;
+			if (b1 <= ' ')
+				continue;
+			b1 = s_mp_ch_val[b1];
+			if (b1 == 0xFF)
+			{
+				DebugLog(@"Invalid byte encountered in data stream");
+				goto LReturn;
+			}
 
-		UInt8 b2 = s_mp_ch_val[*pbSrc++];
-		if (b2 == 0xFF)
-		{
-			DebugLog(@"Invalid byte encountered in data stream");
-			goto LReturn;
+			UInt8 b2 = s_mp_ch_val[*pbSrc++];
+			if (b2 == 0xFF)
+			{
+				DebugLog(@"Invalid byte encountered in data stream");
+				goto LReturn;
+			}
+			
+			*pbDst++ = (b1 << 4) + b2;
 		}
 		
-		*pbDst++ = (b1 << 4) + b2;
+		
+		NSUInteger cbData = pbDst - pabBuffer;
+		DebugLog(@"decoded %d bytes", cbData);
+		dataDecoded = [NSData dataWithBytes:pabBuffer length:cbData];
 	}
-	
-	
-	NSUInteger cbData = pbDst - pabBuffer;
-	DebugLog(@"decoded %d bytes", cbData);
-	dataDecoded = [NSData dataWithBytes:pabBuffer length:cbData];
 
 LReturn:
 	free(pabBuffer);
