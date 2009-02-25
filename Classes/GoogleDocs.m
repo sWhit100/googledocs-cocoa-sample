@@ -60,8 +60,6 @@ enum
 @property (nonatomic, assign) NSInteger idirPath;
 @property (nonatomic, retain) NSString *titleNew;
 @property (nonatomic, retain) NSURL *urlFolderFeed;
-@property (nonatomic, retain) NSArray *aentryRetitle;
-@property (nonatomic, assign) NSInteger ientryRetitle;
 
 @property (nonatomic, retain) NSData *dataToUpload;
 
@@ -69,8 +67,9 @@ enum
 @property (nonatomic, assign) BOOL fDidCreateDir;
 
 @property (nonatomic, assign) BOOL fReplaceExisting;
-@property (nonatomic, retain) NSMutableData *dataDownload;
-@property (nonatomic, assign) long long cbDownloadTotalEstimate;
+
+@property (nonatomic, retain) NSArray *aentryRetitle;
+@property (nonatomic, assign) NSInteger ientryRetitle;
 
 @property (nonatomic, assign) NSInteger cfileKeep;
 @property (nonatomic, retain) NSArray *aentryDelete;
@@ -115,8 +114,6 @@ enum
 			idirPath = m_idirPath,
 			titleNew = m_titleNew,
 			fReplaceExisting = m_fReplaceExisting,
-			dataDownload = m_dataDownload,
-			cbDownloadTotalEstimate = m_cbDownloadTotalEstimate,
 			gop = m_gop,
 			urlFolderFeed = m_urlFolderFeed,
 			aentryRetitle = m_aentryRetitle,
@@ -167,6 +164,10 @@ enum
 {
 	if (self.gop == gopNil)
 	{
+		// since we may be changing accounts, toss out the folder feed cache
+		self.adirPathCache = nil;
+		self.urlFolderFeedCache = nil;
+		
 		self.gop = gopVerifyAccount;
 		[self fetchDocListForFeed:nil title:nil username:username password:password];
 	}
@@ -429,7 +430,20 @@ enum
 	// at a time, instead of calling fetchDocsFeedWithURL, we can create a
 	// GDataQueryDocs object, as shown here.
 	GDataQueryDocs *query = [GDataQueryDocs documentQueryWithFeedURL:urlFeed];
-	[query setMaxResults:100];
+	
+	// Set the number of files we want to 1 unless we're doing one of the operations
+	// that cares about getting all of the files.
+	if (self.gop == gopRetitleFiles || self.gop == gopDeleteFiles)
+	{
+		[query setMaxResults:1000];
+		[service setServiceShouldFollowNextLinks:YES];
+	}
+	else
+	{
+		[query setMaxResults:1];
+		[service setServiceShouldFollowNextLinks:NO];
+	}
+
 	[query setShouldShowFolders:fGetDir];
 	NSString *titleSearch = fGetDir ? [self.adirPath objectAtIndex:self.idirPath] : title;
 	if (titleSearch != nil)
@@ -460,7 +474,7 @@ enum
 	for (GDataEntryBase *entry in [object entries])
 	{
 		DebugLog(@"%@", entry);
-		DebugLog(@"title: %@, edited date: %@",
+		DebugLog(@"title: %@, updated date: %@",
 			[[entry title] stringValue],
 			[[entry updatedDate] RFC3339String]
 			);
@@ -839,15 +853,32 @@ enum
 		// user's account with Safari, or if the document was published with
 		// public access.
 		GDataServiceGoogleDocs *service = [self serviceDocs:self.username password:self.password];
-		DebugLog(@"download document %@ from: %@", [[entry title] stringValue], url);
+		DebugLog(@"download document \"%@\" from: <%@>", [[entry title] stringValue], url);
 		DebugLog(@"user = %@, authToken = %@", service.username, [service authToken]);
 		NSURLRequest *request = [service requestForURL:url
 												  ETag:nil
                                             httpMethod:nil];
 
-		self.dataDownload = [NSMutableData dataWithCapacity:20*1024];
-		self.cbDownloadTotalEstimate = -1;
-		[NSURLConnection connectionWithRequest:request delegate:self];
+		GDataHTTPFetcher *fetcher = [[GDataHTTPFetcher alloc] initWithRequest:request];
+		if (fetcher == nil)
+		{
+			// don't know why creating the fetch would fail, but just in case...
+			[m_owner googleDocsDownloadComplete:self data:nil error:NSErrorWithMessage(@"Attempt to start download failed.", gecFetcherInitFailed)];
+		}
+		else
+		{
+			// prevent the fetcher from storing cookies for use by later instantiations
+			[fetcher setCookieStorageMethod:kGDataHTTPFetcherCookieStorageMethodFetchHistory];
+			
+			// set the option data receiver so we can pass download progress to the caller
+			[fetcher setReceivedDataSelector:@selector(docFetcher:receivedData:)];
+
+			// start the fetch
+			[fetcher beginFetchWithDelegate:self
+				didFinishSelector:@selector(docFetcher:finishedWithData:)
+				didFailSelector:@selector(docFetcher:failedWithError:)
+				];
+		}
 	}
 	else
 	{
@@ -857,33 +888,25 @@ enum
 	}
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+- (void)docFetcher:(GDataHTTPFetcher *)fetcher receivedData:(NSData *)dataReceivedSoFar
 {
-	m_cbDownloadTotalEstimate = [response expectedContentLength];
+	[m_owner googleDocsDownloadProgress:self read:[dataReceivedSoFar length]];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)docFetcher:(GDataHTTPFetcher *)fetcher finishedWithData:(NSData *)data
 {
-	[self.dataDownload appendData:data];
-	
-	[m_owner googleDocsDownloadProgress:self read:[self.dataDownload length] ofEstimatedTotal:m_cbDownloadTotalEstimate];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-	NSData *data = [self.dataDownload retain];
 	[self endOperation];
 	[m_owner googleDocsDownloadComplete:self data:data error:nil];
-	[data release];
+
+	[fetcher release];
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+- (void)docFetcher:(GDataHTTPFetcher *)fetcher failedWithError:(NSError *)error
 {
-	if ([self fRetryCachedQuery])
-		return;
-
 	[self endOperation];
 	[m_owner googleDocsDownloadComplete:self data:nil error:error];
+
+	[fetcher release];
 }
 
 #pragma mark Helper Methods
@@ -1020,7 +1043,6 @@ enum
 	self.title = nil;
 	self.titleNew = nil;
 	self.adirPath = nil;
-	self.dataDownload = nil;
 	self.aentryRetitle = nil;
 	self.aentryDelete = nil;
 }
