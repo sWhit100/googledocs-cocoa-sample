@@ -20,6 +20,11 @@
 
 #import "UploadView.h"
 
+@interface UploadView ()
+
+- (void)initControls;
+
+@end
 
 @implementation UploadView
 
@@ -30,8 +35,24 @@
     if (self = [super initWithFrame:frame])
 	{
         // Initialization code
+		[self initControls];
     }
     return self;
+}
+
+- (void)awakeFromNib
+{
+	[self initControls];
+}
+
+- (void)initControls
+{
+	NSDate *date = [NSDate date];
+	NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
+	[dateformatter setDateFormat:@"MM/dd/yyyy HH:mm:ss z"];
+	
+	m_textfield.text = [dateformatter stringFromDate:date];
+	[dateformatter release];
 }
 
 - (void)dealloc
