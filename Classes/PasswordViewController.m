@@ -137,7 +137,7 @@
 {
 	if (m_status != status)
 		[m_status release];
-	m_status = status;
+	m_status = [status retain];
 
 	if (m_fViewLoaded)
 	{
