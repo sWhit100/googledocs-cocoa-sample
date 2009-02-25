@@ -292,6 +292,15 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	}
 	
 	self.strStatus = [NSString stringWithFormat:@"%@ %@.", strOp, fSuccess ? @"succeeded" : @"failed"];
+	
+	// we may not always have an error record for a failure, but if the operation
+	// was successful, then we should not have an error record
+	Assert(!fSuccess || error == nil);
+
+	// if there was a failure and an error record, append the error code to the end of the string
+	// NOTE: in a real app, we'd also want to show the error's description string
+	if (!fSuccess && error != nil)
+		self.strStatus = [NSString stringWithFormat:@"%@ (%d)", self.strStatus, error.code];
 }
 
 #pragma mark GoogleDocsController
@@ -324,9 +333,9 @@ static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.htm
 	[self updateControlState];
 }
 
-- (void)googleDocsDownloadProgress:(GoogleDocs *)googledocs read:(unsigned long long)cbRead ofEstimatedTotal:(unsigned long long)cbTotalEstimate
+- (void)googleDocsDownloadProgress:(GoogleDocs *)googledocs read:(unsigned long long)cbReadSoFar
 {
-	DebugLog(@"GoogleDocs: downloaded %d of %d", (int)cbRead, (int)cbTotalEstimate);
+	DebugLog(@"GoogleDocs: downloaded %d bytes", (int)cbReadSoFar);
 	Assert(m_gstate == gstateReceivingFile);
 }
 
