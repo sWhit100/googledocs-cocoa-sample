@@ -32,14 +32,22 @@ BOOL FEmptyOrNilString(NSString *str)
 @implementation NSData (IdleLoop)
 
 // REVIEW: Customize this string to tell the user what they are looking at.
+//
+// NOTE: if using this to upload to a Google Docs account,
+// don't include a <title> tag otherwise the title you set on the
+// GDataEntryDocBase will be ignored.
+//
 // NOTE: the last non-whitespace in the prefix has to be "<pre>", and
 // the first non-whitespace in the suffix has to be </pre>.
+//
 static const char s_szPrefix[] =
 	"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n"
 	"<html>\n"
 	"\n"
 	"<head>\n"
+#if 0 // see note above
 	"<title>Your Custom App Data</title>\n"
+#endif
 	"</head>\n"
 	"\n"
 	"<body>\n"
