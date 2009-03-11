@@ -36,8 +36,8 @@ enum // Google Docs state values
 };
 
 // REVIEW: hardcoded folder name and file title for sample app
-static NSString *s_strFileTitle = @"Google Docs Sample App Data.html";
-static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.html";
+static NSString *s_strFileTitle = @"Google Docs Sample App Data.txt";
+static NSString *s_strFileBackupTitle = @"Google Docs Sample App Data Backup.txt";
 
 @interface RootViewController ()
 
