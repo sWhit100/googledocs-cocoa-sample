@@ -580,10 +580,9 @@ enum
 			else
 			{
 				// Insert a new document with the client's data.
-				GDataEntryStandardDoc *entryNew = [classEntry documentEntry];
+				GDataEntryDocBase *entryNew = [classEntry documentEntry];
 
-				[entryNew setTitleWithString:m_title];
-
+				[entryNew setTitleWithString:self.title];
 				[entryNew setUploadData:self.dataToUpload];
 				[entryNew setUploadMIMEType:typeMime];
 				[entryNew setUploadSlug:self.title];
